@@ -1,61 +1,39 @@
-// 定义Header
-const Header = (props) => {
+import { useState } from 'react'
+
+// const Display = ({ counter }) => {
+//   return (
+//     <div>{counter}</div>
+//   )
+// }
+
+const Display = ({ counter }) => <div>{counter}</div>
+
+
+const Button = ({onClick,text}) => {
   return (
-    <div>
-      <h1>{props.course}</h1>
-    </div>
+    <button onClick = {onClick}>
+      {text}
+    </button>
   )
 }
 
-const Content = (props) => {
-  let lists = props.parts
-  return (
-    <div>
-      <p>{lists[0].name} {lists[0].exercises}</p>
-      <p>{lists[1].name} {lists[1].exercises}</p>
-      <p>{lists[1].name} {lists[1].exercises}</p>
-    </div>
-  )
-}
-
-const Total = (props) => {  
-  return (
-    <div>
-      <p>
-        Number of exercises {props.parts[0].exercises + props.parts[1].exercises + props.parts[2].exercises} 
-      </p>
-    </div>
-  )
-}
 
 
 const App = () => {
-  const course = {
-    name: 'Half Stack application development',
-    parts: [
-      {
-        name: 'Fundamentals of React',
-        exercises: 10
-      },
-      {
-        name: 'Using props to pass data',
-        exercises: 7
-      },
-      {
-        name: 'State of a component',
-        exercises: 14
-      }
-    ]
-  }
+  const [ counter, setCounter ] = useState(0)
+
+  const increaseByOne = () => setCounter(counter + 1)
+  const setToZero = () => setCounter(0)
+  const decreseByOne = () => setCounter(counter - 1)
+
   return (
     <div>
-      <Header course={course.name} />
-      <Content parts={course.parts} />
-      <Total parts={course.parts} />
+      <Display counter={counter}/>
+      <Button onClick={increaseByOne} text='plus' />
+      <Button onClick={setToZero} text='zero' />
+      <Button onClick={decreseByOne} text='minus' />
 
     </div>
   )
 }
-
 export default App
-
