@@ -15,9 +15,10 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
- // const handleClick = (setValue, value) => () => setValue(value + 1)
-  // 该写法可能存在出现bug的隐患 更好的写法如下:
-  const handleClick = (setValue, value) => () => setValue(prevValue => prevValue + 1)
+const handleClick=(setValue,value) => {
+  const handle=() => setValue(value+1)
+  return handle
+}
 
   return (
     <div>
@@ -29,8 +30,6 @@ const App = () => {
       <Display text='good' value={good} />
       <Display text='neutral' value={neutral} />
       <Display text='bad' value={bad} />
-      <Display text='all' value={bad + good + neutral} />
-      <Display text='average' value={(bad*-1 + good*1  )/(bad + good + neutral)} />
 
     </div>
   )
