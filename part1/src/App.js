@@ -1,7 +1,35 @@
 import { useState } from 'react'
 
 const Header = props => <div><h1>{props.value}</h1></div>
-const Display = props => <div>{props.text} {props.value}</div>
+//const Statistics = props => <div>{props.text} {props.value}</div>
+
+ // const handleClick = (setValue, value) => () => setValue(value + 1)
+  // 该写法可能存在出现bug的隐患 更好的写法如下:
+  const handleClick = (setValue, value) => () => setValue(prevValue => prevValue + 1)
+  const Display = props => <div>{props.text} {props.value}</div>
+
+
+const Statistics = (props) => {
+  if(props.all === 0) {
+    return (
+      <div>
+        No feedback given
+      </div>
+    )
+  }
+  return (
+    <div>
+      <Header value='statstics' />
+      <Display text='good' value={props.good} />
+      <Display text='neutral' value={props.neutral} />
+      <Display text='bad' value={props.bad} />
+      <Display text='all' value={props.bad + props.good + props.neutral} />
+      <Display text='average' value={( props.good - props.bad  )/(props.bad + props.good + props.neutral)} />
+    </div>
+
+
+  )
+}
 
 const Button = props => (
   <button onClick={props.handleClick}>
@@ -15,9 +43,6 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
- // const handleClick = (setValue, value) => () => setValue(value + 1)
-  // 该写法可能存在出现bug的隐患 更好的写法如下:
-  const handleClick = (setValue, value) => () => setValue(prevValue => prevValue + 1)
 
   return (
     <div>
@@ -25,14 +50,18 @@ const App = () => {
       <Button handleClick={handleClick(setGood,good)} text='good' />
       <Button handleClick={handleClick(setNeutral,neutral)} text='neutral' />
       <Button handleClick={handleClick(setBad,bad)} text='bad' />
-      <Header value='statstics' />
-      <Display text='good' value={good} />
-      <Display text='neutral' value={neutral} />
-      <Display text='bad' value={bad} />
-      <Display text='all' value={bad + good + neutral} />
-      <Display text='average' value={(bad*-1 + good*1  )/(bad + good + neutral)} />
+      <Statistics 
+      all = {bad + good + neutral}
+      good={good}
+      bad={bad}
+      neutral={neutral}
 
+      
+      
+      
+      />
     </div>
+
   )
 }
 
