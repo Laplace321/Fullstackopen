@@ -6,7 +6,7 @@ const Header = props => <div><h1>{props.value}</h1></div>
  // const handleClick = (setValue, value) => () => setValue(value + 1)
   // 该写法可能存在出现bug的隐患 更好的写法如下:
   const handleClick = (setValue, value) => () => setValue(prevValue => prevValue + 1)
-  const StatisticLine = props => <tr><td>{props.text}</td><td>{props.value}</td></tr>
+  const StatisticLine = props => <div>{props.text} {props.value}</div>
 
 
 const Statistics = (props) => {
@@ -20,15 +20,11 @@ const Statistics = (props) => {
   return (
     <div>
       <Header value='statstics' />
-      <table>
-        <tbody>
-        <StatisticLine text='good' value={props.good} />
-        <StatisticLine text='neutral' value={props.neutral} />
-        <StatisticLine text='bad' value={props.bad} />
-        <StatisticLine text='all' value={props.bad + props.good + props.neutral} />
-        <StatisticLine text='average' value={( props.good - props.bad  )/(props.bad + props.good + props.neutral)} />
-        </tbody>
-      </table>
+      <StatisticLine text='good' value={props.good} />
+      <StatisticLine text='neutral' value={props.neutral} />
+      <StatisticLine text='bad' value={props.bad} />
+      <StatisticLine text='all' value={props.bad + props.good + props.neutral} />
+      <StatisticLine text='average' value={( props.good - props.bad  )/(props.bad + props.good + props.neutral)} />
     </div>
 
 
