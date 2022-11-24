@@ -28,11 +28,7 @@ const App = () => {
     let copy = [...points]
     copy[selected] += 1
   
-   // 正确用法
-   setPoints(copy) 
-   // 错误用法
-   // setPoints(prevPoints => copy) 
-   // Q1:为啥这里用第二种写法不行
+   setPoints(prevPoints => copy) 
    // Q2:为啥需要用copy复制一份状态数组，不能直接对数组进行处理
   }
 
