@@ -1,7 +1,59 @@
 import { useState } from 'react'
 import Person from './components/Person'
 
+const Filter = ({ name, value, onChange }) => {
+  return (
+    <div>
+      filter shown with:
+      <input
+        name={name}
+        value={value}
+        onChange={onChange}
+      />
+    </div>
+  )
+}
 
+const PersonForm = ({ newName, newNumber, addPerson }) => {
+  return (
+    <form onSubmit={addPerson}>
+      <div>
+        name:
+        <input
+          // 为 <input> 添加 name 属性后可通过 <form> 读取出值
+          name={newName}
+
+        // 这个 <input> 不需要再是受控组件了
+        // value={newName}
+        // onChange={handlePersonChange}
+        />
+      </div>
+      <div>
+        number:
+        <input
+          name={newNumber}
+        />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  )
+}
+
+const Persons = ({ persons,shownPerson}) => {
+  const personsToShow = persons.filter(person => person.name.search(new RegExp(shownPerson, 'i')) !== -1)
+
+  return (
+    <div>
+      {personsToShow.map((person) => (
+        /** person 有一个 id 了，为什么不用 id 做 key 呢 */
+        <Person key={person.id} person={person} />
+      ))}
+    </div>
+  )
+
+}
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456', id: 1 },
@@ -88,65 +140,18 @@ const App = () => {
   //   console.log(event.target.value);
   //   setNewName(event.target.value);
   // };
-    const handleShownNameChange= (event) => {
-      console.log(event.target.value)
-      setShownPerson(event.target.value)
-    }
-    
-    const personsToShow = persons.filter(person => person.name.search(new RegExp(shownPerson, 'i')) !== -1 )
+  const handleShownNameChange = (event) => {
+    console.log(event.target.value)
+    setShownPerson(event.target.value)
+  }
   return (
     <div>
       <h2>Phonebook</h2>
-        <div>
-          filter shown with:
-            <input 
-              name="shownName"
-              value={shownPerson}
-              onChange={handleShownNameChange}
-            />
-        </div>
-        <h2>add a new</h2>
-      <form onSubmit={addPerson}>
-        <div>
-          name:
-          <input
-            // 为 <input> 添加 name 属性后可通过 <form> 读取出值
-            name="newName"
-
-            // 这个 <input> 不需要再是受控组件了
-            // value={newName}
-            // onChange={handlePersonChange}
-          />
-        </div>
-        <div>
-          number:
-          <input
-            name="newNumber"
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-      {
-        // <div>debug: newname {newName}</div>
-      }
-
-      {
-        /**
-         * 这里不太明白为什么要用 persons.name
-         * persons 是个 array
-         */
-        // <div>debug: persons {persons.name}</div>
-      }
-
-      <div>
-        {personsToShow.map((person) => (
-          /** person 有一个 id 了，为什么不用 id 做 key 呢 */
-          <Person key={person.name} person={person} />
-        ))}
-      </div>
+      <Filter name='shownName' value={shownPerson} onChange={handleShownNameChange} />
+      <h3>Add a new</h3>
+      <PersonForm newName="newName" newNumber="newNumber" addPerson={addPerson} />
+      <h3>Numbers</h3>
+      <Persons persons={persons} shownPerson={shownPerson} />
     </div>
   )
 }
