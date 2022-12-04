@@ -14,29 +14,29 @@ const Filter = ({ value, onChange }) => {
 }
 
 const PersonFromNew = ({addPerson}) => {
+  const handleSubmit = (event) => {
+    event.preventDefault()
 
+    // 可以通过这种方式读出值
+    const newPersonNameFromForm = event.target.personName.value
+    const newPersonNumberFromForm = event.target.personNumber.value
+    
+    addPerson(newPersonNameFromForm,newPersonNumberFromForm)
 
-}
+    event.target.personName.value =''
+    event.target.personNumber.value = ''
 
-const PersonForm = ({ newName, newNumber, addPerson }) => {
+  }
+
   return (
-    <form onSubmit={addPerson}>
+    <form onSubmit={handleSubmit}>
       <div>
         name:
-        <input
-          // 为 <input> 添加 name 属性后可通过 <form> 读取出值
-          name={newName}
-
-        // 这个 <input> 不需要再是受控组件了
-        // value={newName}
-        // onChange={handlePersonChange}
-        />
+        <input name="personName" />
       </div>
       <div>
         number:
-        <input
-          name={newNumber}
-        />
+        <input name="personNumber" />
       </div>
       <div>
         <button type="submit">add</button>
@@ -45,7 +45,35 @@ const PersonForm = ({ newName, newNumber, addPerson }) => {
   )
 }
 
+// const PersonForm = ({ newName, newNumber, addPerson }) => {
+//   return (
+//     <form onSubmit={addPerson}>
+//       <div>
+//         name:
+//         <input
+//           // 为 <input> 添加 name 属性后可通过 <form> 读取出值
+//           name={newName}
+
+//         // 这个 <input> 不需要再是受控组件了
+//         // value={newName}
+//         // onChange={handlePersonChange}
+//         />
+//       </div>
+//       <div>
+//         number:
+//         <input
+//           name={newNumber}
+//         />
+//       </div>
+//       <div>
+//         <button type="submit">add</button>
+//       </div>
+//     </form>
+//   )
+// }
+
 const Persons = ({ persons,shownPerson}) => {
+
   const personsToShow = persons.filter(person => person.name.search(new RegExp(shownPerson, 'i')) !== -1)
 
   return (
@@ -79,12 +107,7 @@ const App = () => {
   // 所以只要为 <input> 添加 name 属性（见下），那么 onSubmit 的 event
   // 其 target（即 <form>）就会有对应 name 的属性（即对应的 <input>）
   // 再通过 .value 就可以读出 <input> 的值
-  const addPerson = (event) => {
-    event.preventDefault();
-
-    // 可以通过这种方式读出值
-    const newPersonNameFromForm = event.target.newName.value;
-    const newPersonNumberFromForm = event.target.newNumber.value;
+  const addPerson = (name,number) => {
 
     // 不需要先就构造这个 object
     // const personObject = {
@@ -107,7 +130,7 @@ const App = () => {
     // 目的是检查 persons 里是是否有某项的 name 与提交的值相等，可以用 Array.prototype.some() 方法
     // 见 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
     const isExistingPerson = persons.some((person) => {
-      return person.name === newPersonNameFromForm;
+      return person.name === name;
     })
 
     // 还有一个方法是 Array.prototype.every()，是检查 persons 里每一项是否都如何如何
@@ -126,16 +149,13 @@ const App = () => {
       // id 不要遗漏了
       setPersons(
         persons.concat({
-          name: newPersonNameFromForm,
-          number: newPersonNumberFromForm,
+          name: name,
+          number: number,
           id: persons.length + 1,
         })
       )
-      // 通过 DOM 去删掉 <input> 的值
-      event.target.newName.value = ''
-      event.target.newNumber.value = ''
     } else {
-      alert(`${newPersonNameFromForm} already exists. `);
+      alert(`${name} already exists. `);
     }
   }
 
@@ -153,7 +173,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <Filter  value={shownPerson} onChange={handleShownNameChange} />
       <h3>Add a new</h3>
-      <PersonForm newName="newName" newNumber="newNumber" addPerson={addPerson} />
+      <PersonFromNew  addPerson={addPerson} />
       <h3>Numbers</h3>
       <Persons persons={persons} shownPerson={shownPerson} />
     </div>
