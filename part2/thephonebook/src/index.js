@@ -1,40 +1,6 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import axios  from 'axios';
+import React from 'react'
+import ReactDOM from 'react-dom/client'
 
-// const promise = axios.get('http://localhost:3001/notes')
+import App from './App'
 
-// promise.then(response1 => {
-//   console.log(response1)
-// })
-
-// axios.get('http://localhost:3001/notes').then(response => {
-//   const notes = response.data
-//   console.log(notes)
-// })
-
-axios
-  .get('http://localhost:3001/notes')
-  .then(response => {
-    const notes = response.data
-    console.log(notes)
-  })
-
-
-const promise2 = axios.get('http://localhost:3001/foobar')
-console.log(promise2)
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+ReactDOM.createRoot(document.getElementById('root')).render(<App />)

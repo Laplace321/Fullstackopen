@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState ,useEffect} from 'react'
 import Person from './components/Person'
+import axios from 'axios'
 
 const Filter = ({ value, onChange }) => {
   return (
@@ -87,13 +88,21 @@ const Persons = ({ persons,shownPerson}) => {
 
 }
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ])
+
+
+
+
+  const [persons, setPersons] = useState([])
+
   const [shownPerson, setShownPerson] = useState('')
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
 
   // 这里是个常见的误区：跟踪不必要的状态
   // 这个程序只有在最后点 add 的时候才需要检查用户提交的名字是否在 persons 里
