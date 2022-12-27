@@ -1,12 +1,13 @@
-import { useState ,useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import Person from './components/Person'
-import axios from 'axios'
+import personService from './services/persons'
 
+// Filter：用于过滤显示的名单
 const Filter = ({ value, onChange }) => {
   return (
     <div>
       <label >filter shown with:</label>
-      <input 
+      <input
         value={value}
         onChange={onChange}
       />
@@ -14,21 +15,21 @@ const Filter = ({ value, onChange }) => {
   )
 }
 
-const PersonFromNew = ({addPerson}) => {
+// PersonFromNew：处理addPerson
+const PersonFromNew = ({ addPerson }) => {
   const handleSubmit = (event) => {
     event.preventDefault()
 
     // 可以通过这种方式读出值
     const newPersonNameFromForm = event.target.personName.value
     const newPersonNumberFromForm = event.target.personNumber.value
-    
-    addPerson(newPersonNameFromForm,newPersonNumberFromForm)
 
-    event.target.personName.value =''
+    addPerson(newPersonNameFromForm, newPersonNumberFromForm)
+
+    event.target.personName.value = ''
     event.target.personNumber.value = ''
 
   }
-
   return (
     <form onSubmit={handleSubmit}>
       <div>
@@ -46,61 +47,27 @@ const PersonFromNew = ({addPerson}) => {
   )
 }
 
-// const PersonForm = ({ newName, newNumber, addPerson }) => {
-//   return (
-//     <form onSubmit={addPerson}>
-//       <div>
-//         name:
-//         <input
-//           // 为 <input> 添加 name 属性后可通过 <form> 读取出值
-//           name={newName}
-
-//         // 这个 <input> 不需要再是受控组件了
-//         // value={newName}
-//         // onChange={handlePersonChange}
-//         />
-//       </div>
-//       <div>
-//         number:
-//         <input
-//           name={newNumber}
-//         />
-//       </div>
-//       <div>
-//         <button type="submit">add</button>
-//       </div>
-//     </form>
-//   )
-// }
-
-const Persons = ({ persons,shownPerson}) => {
+const Persons = ({ persons, shownPerson,deleteState }) => {
 
   const personsToShow = persons.filter(person => person.name.search(new RegExp(shownPerson, 'i')) !== -1)
 
   return (
     <div>
       {personsToShow.map((person) => (
-        /** person 有一个 id 了，为什么不用 id 做 key 呢 */
-        <Person key={person.id} person={person} />
+        <Person key={person.id} person={person} deleteState={deleteState} />
       ))}
     </div>
   )
-
 }
 const App = () => {
-
-
-
-
   const [persons, setPersons] = useState([])
-
   const [shownPerson, setShownPerson] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
   }, [])
 
@@ -116,75 +83,59 @@ const App = () => {
   // 所以只要为 <input> 添加 name 属性（见下），那么 onSubmit 的 event
   // 其 target（即 <form>）就会有对应 name 的属性（即对应的 <input>）
   // 再通过 .value 就可以读出 <input> 的值
-  const addPerson = (name,number) => {
-
-    // 不需要先就构造这个 object
-    // const personObject = {
-    //   name: newName,
-    // };
-
-    // 这就是 imperative 的编程习惯，为了达成某样目的，通过代码一步步指导如何做
-    // 以及为了存储判断的值，需要在实际业务的上层 scope 去留存一个变量
-    // 有语法错误哈😅
-    // doesItExist / isExisting / itExists
-    // let isExists = 0;
-    // persons.forEach((person) => {
-    //   if (person.name === newName) {
-    //     isExists += 1;
-    //   }
-    // });
-    // 不是说 imperative 不好，都是达成同样的效果
-    // 想像成手动挡和自动挡吧
-
-    // 目的是检查 persons 里是是否有某项的 name 与提交的值相等，可以用 Array.prototype.some() 方法
-    // 见 https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
+  const addPerson = (name, number) => {
     const isExistingPerson = persons.some((person) => {
       return person.name === name;
     })
 
-    // 还有一个方法是 Array.prototype.every()，是检查 persons 里每一项是否都如何如何
 
-    // if (isExists === 0) {
-    //   setPersons(persons.concat(personObject));
-    //   setNewName('');
-    // } else {
-    //   alert(`${newName} is already added to phonebook `);
-    // }
 
-    // 注意 true/false，我们判断的是 persons 里是否已经有了提交的名字
-    // if 里的判断和 if/else 对应执行的逻辑要符合业务
     if (!isExistingPerson) {
-      // 此处再去构造要添加的新 person
-      // id 不要遗漏了
-      setPersons(
-        persons.concat({
-          name: name,
-          number: number,
-          id: persons.length + 1,
+      const newPerson = {
+        name: name,
+        number: number,
+        // id: persons.length + 1,
+      }
+
+      personService
+        .create(newPerson)
+        .then(newPerson => {
+          setPersons(persons.concat(newPerson))
         })
-      )
-    } else {
-      alert(`${name} already exists. `);
-    }
+    } else if(window.confirm(`${name} already exists,replace the old number with a new one?`)){
+      const person = persons.find(n => n.name === name)
+      const changePerson = {...person,number:number}
+      personService
+        .update(changePerson.id,changePerson)
+        .then(() => updateState(changePerson.id,changePerson))      
+
+    } 
   }
 
-  // 使用 ref 或通过 <form> onSubmit 去读取值，这里不需要了
-  // const handlePersonChange = (event) => {
-  //   console.log(event.target.value);
-  //   setNewName(event.target.value);
-  // };
+
+
   const handleShownNameChange = (event) => {
     console.log(event.target.value)
     setShownPerson(event.target.value)
   }
+
+  const deleteState = (id) => {
+    setPersons(persons => persons.filter(p => p.id !== id))
+  } 
+
+  const updateState = (id,newPerson) => {
+    setPersons(persons => persons.filter(p => p.id !== id))
+    setPersons(persons.map(person=>person.id !== id ? person : newPerson))
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter  value={shownPerson} onChange={handleShownNameChange} />
+      <Filter value={shownPerson} onChange={handleShownNameChange} />
       <h3>Add a new</h3>
-      <PersonFromNew  addPerson={addPerson} />
+      <PersonFromNew addPerson={addPerson} />
       <h3>Numbers</h3>
-      <Persons persons={persons} shownPerson={shownPerson} />
+      <Persons persons={persons} shownPerson={shownPerson} deleteState={deleteState}/>
     </div>
   )
 }

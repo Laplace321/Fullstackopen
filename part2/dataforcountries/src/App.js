@@ -14,10 +14,40 @@ const FindCountries = ({ value, onChange }) => {
 }
 
 const Country = ({ country }) => {
+    const 
   return (
     <div>
       {country.name.common}
+      <button onClick={() => setShownView(!shownView)}>
+        show
+      </button>
     </div>
+  )
+}
+const ShowView = ({country}) => {
+  console.log(country)
+  const languageList = Object.entries(country.languages)
+  // console.log(languageList[0])
+
+  return (
+    <div>
+      <h1>{country.name.common}</h1>
+      <p>
+        capital:{country.capital}<br></br>
+        area:{country.area}
+      </p>
+      <h2>languages:</h2>
+      <ul>
+        {languageList.map(value => (
+          <li key={value[0]}>{value[1]}</li>
+        ))}
+      </ul>
+      <img
+        src={country.flags.svg}
+        alt={country.name}
+      />
+    </div>
+
   )
 }
 
@@ -40,39 +70,20 @@ const ShowMatches = ({ countries, shownCountries }) => {
 
   }
   else if (countriesToShow.length === 1) {
-    const languageList = Object.entries(countriesToShow[0].languages)
-    console.log(languageList[0])
-
+    // console.log(countriesToShow[0])
     return (
-      <div>
-        <h1>{countriesToShow[0].name.common}</h1>
-        <p>
-          capital:{countriesToShow[0].capital}<br></br>
-          area:{countriesToShow[0].area}
-        </p>
-        <h2>languages:</h2>
-        <ul>
-          {languageList.map(value => (
-            <li key={value[0]}>{value[1]}</li>
-          ))}
-        </ul>
-        <img
-          src={countriesToShow[0].flags.svg}
-          alt={countriesToShow[0].name}
-        />
-      </div>
-
+    <ShowView country = {countriesToShow[0]} />
     )
   }
 }
 
 const App = () => {
   const [countries, setCountries] = useState([])
-
   const [shownCountries, setShownCountries] = useState('')
+  
 
   const handleshownCountriesChange = (event) => {
-    console.log(event.target.value)
+    // console.log(event.target.value)
     setShownCountries(event.target.value)
   }
 
