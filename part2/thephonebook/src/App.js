@@ -59,9 +59,24 @@ const Persons = ({ persons, shownPerson,deleteState }) => {
     </div>
   )
 }
+
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='notification'>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [shownPerson, setShownPerson] = useState('')
+  const [notification,setNotification] = useState(null)
+  // const [notExistingNotification,setNotExistingNotification] = useState(null)
 
   useEffect(() => {
     personService
@@ -87,7 +102,10 @@ const App = () => {
     const isExistingPerson = persons.some((person) => {
       return person.name === name;
     })
-
+    const showNotification = (name) => {
+      setNotification(`${name} Added`)
+      setTimeout(()=>setNotification(null),2000)
+    }
 
 
     if (!isExistingPerson) {
@@ -97,17 +115,29 @@ const App = () => {
         // id: persons.length + 1,
       }
 
+
       personService
         .create(newPerson)
         .then(newPerson => {
           setPersons(persons.concat(newPerson))
         })
+        .then(() => showNotification(name))
     } else if(window.confirm(`${name} already exists,replace the old number with a new one?`)){
       const person = persons.find(n => n.name === name)
       const changePerson = {...person,number:number}
+      const showNotExistingNotification = (name) => {
+        setNotification(`Information of ${name} has already been removed from server`)
+        setTimeout(()=>setNotification(null),2000)
+      }
+
       personService
         .update(changePerson.id,changePerson)
-        .then(() => updateState(changePerson.id,changePerson))      
+        .then(() => updateState(changePerson.id,changePerson))  
+        .then(() => showNotification(name))
+        .catch(error => {
+          showNotExistingNotification(name)
+        }
+        )
 
     } 
   }
@@ -131,6 +161,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
       <Filter value={shownPerson} onChange={handleShownNameChange} />
       <h3>Add a new</h3>
       <PersonFromNew addPerson={addPerson} />
